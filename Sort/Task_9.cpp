@@ -1,4 +1,4 @@
-// 2. По году рождения с помощью сортировки подсчетом.
+// 9. Сначала по году рождения, потом по стажу работы с помощью сортировки расческой.
 
 #include <iostream>
 #include <fstream>
@@ -71,23 +71,28 @@ void print(people x) { // функция для вывода в файл
 	out << x.experience << " " << x.salary << endl;
 }
 
+bool operator<(people a, people b) {
+	if (a.dateofbirth.yy < b.dateofbirth.yy) return true;
+	if (a.dateofbirth.yy == b.dateofbirth.yy && a.experience < b.experience) return true;
+	return false;
+}
+
 void sorting(vector<people>& x) { // сортировка подсчетом и вывод данных в фыйл
-	vector<vector<people>> counting(100);
-	for (vector<people>::iterator iter = x.begin();iter != x.end(); iter++) {
-		people p = *iter;
-		counting[p.dateofbirth.yy].push_back(p);
-	}
-	int n = x.size();
-	x.clear();
-	x.resize(n);
-	for (vector<vector<people>>::iterator iter = counting.begin();iter != counting.end();iter++) {
-		vector<people> temp = *iter;
-		for (vector<people>::iterator iter1 = temp.begin(); iter1 != temp.end(); iter1++)
-		{
-			people p = *iter1;
-			x.push_back(p);
+	double factor = 1.2473309;
+	int step = x.size() - 1;
+	while (step >= 1) {
+		for (int i = 0; i + step < x.size();i++) {
+			if (x[i].dateofbirth.yy > x[i + step].dateofbirth.yy)
+				swap(x[i], x[i + step]);
+			else if (x[i].dateofbirth.yy == x[i + step].dateofbirth.yy && x[i].experience > x[i + 1].experience)
+				swap(x[i], x[i + step]);
+			else if ((x[i].dateofbirth.yy == x[i+1].dateofbirth.yy && x[i].experience >x[i+1].experience) || (x[i].dateofbirth.yy >  x[i+1].dateofbirth.yy))
+				swap(x[i], x[i + step]);
+			
 		}
+		step /= factor;
 	}
+
 	for (vector<people>::iterator iter = x.begin(); iter != x.end(); iter++) {
 		people temp = *iter;
 		if (temp.surname != "")
